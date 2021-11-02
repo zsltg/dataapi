@@ -1,16 +1,16 @@
 """DataAPI Main"""
-from fastapi import FastAPI
+import fastapi
 
 import dataapi
+from dataapi.routers import data_router
+from dataapi.services import mongodb
 
-app = FastAPI(
-    title="DataAPI",  # pragma: no mutate
-    description="Data API for chatbots",  # pragma: no mutate
-    version=dataapi.__version__,  # pragma: no mutate
-)  # pragma: no mutate
+APP = fastapi.FastAPI(
+    title="DataAPI",
+    description="Data API for chatbots",
+    version=dataapi.__version__,
+)
 
-
-@app.get("/")  # pragma: no mutate
-def read_root():
-    """Root"""
-    return {"Hello": "World"}
+APP.add_event_handler("startup", mongodb.connect)
+APP.add_event_handler("shutdown", mongodb.disconnect)
+APP.include_router(data_router.ROUTER)

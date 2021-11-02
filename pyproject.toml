@@ -9,6 +9,10 @@ python = "^3.9"
 fastapi = "^0.70.0"
 uvicorn = "^0.15.0"
 gunicorn = "^20.1.0"
+motor = "^2.5.1"
+bson = "^0.5.10"
+requests = "^2.26.0"
+python-dotenv = "^0.19.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.5"
@@ -16,6 +20,7 @@ pylint = "^2.11.1"
 black = "^21.10b0"
 mypy = "^0.910"
 mutmut = "^2.2.0"
+requests = "^2.26.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
