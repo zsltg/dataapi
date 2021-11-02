@@ -5,6 +5,7 @@ from fastapi import responses
 
 from dataapi.models import dialog_model
 from dataapi.services import mongodb
+from dataapi import utils
 
 
 async def record_consent(
@@ -15,16 +16,12 @@ async def record_consent(
             {"_id": dialog_id}, {"$set": {"consent_received": consent}}
         )
         if result.matched_count:
-            return responses.JSONResponse(
-                status_code=fastapi.status.HTTP_204_NO_CONTENT
-            )
+            return responses.JSONResponse(status_code=fastapi.status.HTTP_200_OK)
         else:
             return responses.JSONResponse(status_code=fastapi.status.HTTP_404_NOT_FOUND)
     else:
         result = await db.chatbot.dialog.delete_one({"_id": dialog_id})
         if result.deleted_count:
-            return responses.JSONResponse(
-                status_code=fastapi.status.HTTP_204_NO_CONTENT
-            )
+            return responses.JSONResponse(status_code=fastapi.status.HTTP_200_OK)
         else:
             return responses.JSONResponse(status_code=fastapi.status.HTTP_404_NOT_FOUND)

@@ -7,7 +7,6 @@ from tests import test_base
 
 
 class RoutersDataTest(test_base.BaseTest):
-
     def test_record_consent(self):
         with testclient.TestClient(main.app) as client:
             # create dialogs
@@ -23,7 +22,7 @@ class RoutersDataTest(test_base.BaseTest):
                 data="true",
             )
             # check if consent is set for first dialog
-            self.assertEqual(response.status_code, 204)
+            self.assertEqual(response.status_code, 200)
             response = client.get(
                 f"{self._data_path_prefix}/{dialog['customer_id']}/{dialog['dialog_id']}",
             )
@@ -33,7 +32,7 @@ class RoutersDataTest(test_base.BaseTest):
                 f"{self._consent_path_prefix}/{dialog['dialog_id']}",
                 data="false",
             )
-            self.assertEqual(response.status_code, 204)
+            self.assertEqual(response.status_code, 200)
             # check if first dialog is removed
             response = client.get(
                 f"{self._data_path_prefix}/{dialog['customer_id']}/{dialog['dialog_id']}",
@@ -45,7 +44,7 @@ class RoutersDataTest(test_base.BaseTest):
                 f"{self._consent_path_prefix}/{dialog['dialog_id']}",
                 data="false",
             )
-            self.assertEqual(response.status_code, 204)
+            self.assertEqual(response.status_code, 200)
             # check if second dialog is removed
             response = client.get(
                 f"{self._data_path_prefix}/{dialog['customer_id']}/{dialog['dialog_id']}",

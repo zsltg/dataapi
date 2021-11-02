@@ -7,7 +7,6 @@ from tests import test_base
 
 
 class RoutersDataTest(test_base.BaseTest):
-
     def test_create_dialog(self):
         with testclient.TestClient(main.app) as client:
             # create first dialog, should succeed

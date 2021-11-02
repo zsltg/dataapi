@@ -1,5 +1,7 @@
+import typing
+import datetime
 import fastapi
-
+import fastapi_pagination
 from fastapi import encoders
 from motor import motor_asyncio
 
@@ -8,6 +10,21 @@ from dataapi.models import dialog_model
 from dataapi.controllers import dialog_controller
 
 router = fastapi.APIRouter()
+
+
+@router.get(
+    "/data/",
+    response_model=fastapi_pagination.Page[dialog_model.DialogModel],
+)
+async def fetch_dialogs(
+    page: int = 1,
+    size: int = 100,
+    language: typing.Optional[str] = None,
+    customer_id: typing.Optional[str] = None,
+    db: motor_asyncio.AsyncIOMotorClient = fastapi.Depends(mongodb.get_database),
+):
+    params = fastapi_pagination.Params(page=page, size=size)
+    return await dialog_controller.fetch_dialogs(db, params, language, customer_id)
 
 
 @router.get("/data/{customer_id}/{dialog_id}")
@@ -36,6 +53,7 @@ async def create_dialog(
             dialog_id=dialog_id,
             text=dialog_body.text,
             language=dialog_body.language,
+            date=datetime.datetime.utcnow(),
         )
     )
     return await dialog_controller.create_dialog(db, dialog_entry)

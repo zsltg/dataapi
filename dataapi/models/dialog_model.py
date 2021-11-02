@@ -1,5 +1,6 @@
 import pydantic
 import bson
+import datetime
 
 
 class PyObjectId(bson.ObjectId):
@@ -37,6 +38,7 @@ class DialogModel(DialogBaseModel):
     dialog_id: str = pydantic.Field(alias="_id")
     customer_id: str = pydantic.Field(...)
     consent_received = False
+    date: datetime.datetime = pydantic.Field(...)
 
     class Config:
         allow_population_by_field_name = True

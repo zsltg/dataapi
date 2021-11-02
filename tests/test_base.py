@@ -12,22 +12,22 @@ class BaseTest(unittest.TestCase):
     _consent_path_prefix = "/consents"
     _dialogs = [
         {
-            "dialog_id": "1234",
+            "dialog_id": "123453697821-b204-474d-b646-d8702690381e",
             "customer_id": "janedoe",
             "body": {"text": "The quick brown fox", "language": "EN"},
         },
         {
-            "dialog_id": "1235",
+            "dialog_id": "123522037567-ad6b-441c-8e28-25f3c9e4558b",
             "customer_id": "janedoe",
             "body": {"text": "Jumps over the lazy dog", "language": "EN"},
         },
         {
-            "dialog_id": "5678",
+            "dialog_id": "56781f4e9adb-d343-4129-8e2d-435387d16c7f",
             "customer_id": "johndoe",
             "body": {"text": "Der schnelle braune Fuchs", "language": "DE"},
         },
         {
-            "dialog_id": "5679",
+            "dialog_id": "567969636056-d26a-4785-b828-b145c0c62144",
             "customer_id": "johndoe",
             "body": {"text": "Springt über den faulen Hund", "language": "DE"},
         },
