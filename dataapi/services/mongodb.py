@@ -2,25 +2,25 @@ from motor import motor_asyncio
 
 from dataapi import config
 
-SETTINGS = config.get_settings()
+settings = config.get_settings()
 
 
 class DataBase:
     client: motor_asyncio.AsyncIOMotorClient = None
 
 
-DB = DataBase()
+db = DataBase()
 
 
 async def get_database() -> motor_asyncio.AsyncIOMotorClient:
-    return DB.client
+    return db.client
 
 
 async def connect():
-    DB.client = motor_asyncio.AsyncIOMotorClient(
-        str("mongodb://{}:{}".format(SETTINGS.mongodb_url, SETTINGS.mongodb_port))
+    db.client = motor_asyncio.AsyncIOMotorClient(
+        str("mongodb://{}:{}".format(settings.mongodb_url, settings.mongodb_port))
     )
 
 
 async def disconnect():
-    DB.client.close()
+    db.client.close()

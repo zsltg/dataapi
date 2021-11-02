@@ -7,6 +7,20 @@ from dataapi.models import dialog_model
 from dataapi.services import mongodb
 
 
+async def fetch_dialog(
+    db: motor_asyncio.AsyncIOMotorClient, customer_id: str, dialog_id: str
+):
+    dialog_entry = await db.chatbot.dialog.find_one(
+        {"_id": dialog_id, "customer_id": customer_id}
+    )
+    if dialog_entry:
+        return responses.JSONResponse(
+            status_code=fastapi.status.HTTP_200_OK, content=dialog_entry
+        )
+    else:
+        return responses.JSONResponse(status_code=fastapi.status.HTTP_404_NOT_FOUND)
+
+
 async def create_dialog(
     db: motor_asyncio.AsyncIOMotorClient, dialog_entry: dialog_model.DialogModel
 ):
@@ -20,6 +34,8 @@ async def create_dialog(
     )
 
 
-async def remove_dialog(db: motor_asyncio.AsyncIOMotorClient, dialog_id: str):
-    await db.chatbot.dialog.delete_one({"_id": dialog_id})
+async def remove_dialog(
+    db: motor_asyncio.AsyncIOMotorClient, customer_id: str, dialog_id: str
+):
+    await db.chatbot.dialog.delete_one({"_id": dialog_id, "customer_id": customer_id})
     return responses.JSONResponse(status_code=fastapi.status.HTTP_204_NO_CONTENT)

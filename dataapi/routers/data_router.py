@@ -7,10 +7,19 @@ from dataapi.services import mongodb
 from dataapi.models import dialog_model
 from dataapi.controllers import dialog_controller
 
-ROUTER = fastapi.APIRouter()
+router = fastapi.APIRouter()
 
 
-@ROUTER.post(
+@router.get("/data/{customer_id}/{dialog_id}")
+async def fetch_dialog(
+    customer_id: str,
+    dialog_id: str,
+    db: motor_asyncio.AsyncIOMotorClient = fastapi.Depends(mongodb.get_database),
+):
+    return await dialog_controller.fetch_dialog(db, customer_id, dialog_id)
+
+
+@router.post(
     "/data/{customer_id}/{dialog_id}",
     response_description="Add new dialog",
     response_model=dialog_model.DialogBaseModel,
@@ -32,9 +41,10 @@ async def create_dialog(
     return await dialog_controller.create_dialog(db, dialog_entry)
 
 
-@ROUTER.delete("/data/{dialog_id}")
+@router.delete("/data/{customer_id}/{dialog_id}")
 async def remove_dialog(
+    customer_id: str,
     dialog_id: str,
     db: motor_asyncio.AsyncIOMotorClient = fastapi.Depends(mongodb.get_database),
 ):
-    return await dialog_controller.remove_dialog(db, dialog_id)
+    return await dialog_controller.remove_dialog(db, customer_id, dialog_id)

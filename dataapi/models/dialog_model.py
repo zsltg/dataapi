@@ -36,6 +36,7 @@ class DialogBaseModel(pydantic.BaseModel):
 class DialogModel(DialogBaseModel):
     dialog_id: str = pydantic.Field(alias="_id")
     customer_id: str = pydantic.Field(...)
+    consent_received = False
 
     class Config:
         allow_population_by_field_name = True
