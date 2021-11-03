@@ -14,17 +14,18 @@ router = fastapi.APIRouter()
 
 @router.get(
     "/data/",
-    response_model=fastapi_pagination.Page[dialog_model.DialogModel],
+    response_model=fastapi_pagination.LimitOffsetPage[dialog_model.DialogModel],
 )
 async def fetch_dialogs(
-    page: int = 1,
-    size: int = 100,
+    limit: int = 100,
+    offset: int = 0,
     language: typing.Optional[str] = None,
     customer_id: typing.Optional[str] = None,
     db: motor_asyncio.AsyncIOMotorClient = fastapi.Depends(mongodb.get_database),
 ):
-    params = fastapi_pagination.Params(page=page, size=size)
-    return await dialog_controller.fetch_dialogs(db, params, language, customer_id)
+    return await dialog_controller.fetch_dialogs(
+        db, limit, offset, language, customer_id
+    )
 
 
 @router.get("/data/{customer_id}/{dialog_id}")
