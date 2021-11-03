@@ -4,6 +4,7 @@ import datetime
 import uuid
 import random
 import string
+import asyncio
 
 from fastapi import encoders
 import pymongo
@@ -25,6 +26,11 @@ class BaseTest(unittest.TestCase):
     _bulk_customer_count = 10
     _bulk_dialog_count = 1000
     _bulk_consent_count = 500
+    _language_counts = []
+    _a_customer_id = ""
+    _dialog_count_for_a_customer = 0
+    _a_language_for_a_customer = ""
+    _dialog_count_for_a_customer_in_language = 0
 
     def setUp(self):
         self._db.delete_many({})
@@ -39,6 +45,34 @@ class BaseTest(unittest.TestCase):
             self._db.update_one(
                 {"_id": entry["_id"]}, {"$set": {"consent_received": True}}
             )
+        self._language_counts = []
+        loop = asyncio.get_event_loop()
+
+        async def set_language_counts():
+            for language in self._languages:
+                count = self._db.count_documents(
+                    {"language": language, "consent_received": True}
+                )
+                self._language_counts.append(count)
+
+        loop.run_until_complete(set_language_counts())
+
+        async def set_dialog_count_for_a_customer():
+            dialog = self._db.find_one({})
+            self._a_customer_id = dialog["customer_id"]
+            self._a_language_for_a_customer = dialog["language"]
+            self._dialog_count_for_a_customer = self._db.count_documents(
+                {"customer_id": self._a_customer_id, "consent_received": True}
+            )
+            self._dialog_count_for_a_customer_in_language = self._db.count_documents(
+                {
+                    "language": self._a_language_for_a_customer,
+                    "customer_id": self._a_customer_id,
+                    "consent_received": True,
+                }
+            )
+
+        loop.run_until_complete(set_dialog_count_for_a_customer())
 
     def tearDown(self):
         self._db.delete_many({})
