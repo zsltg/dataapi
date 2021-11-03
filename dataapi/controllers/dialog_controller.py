@@ -20,13 +20,10 @@ async def fetch_dialogs(
     query = {
         "$and": [{"consent_received": True}]
     }  # type: typing.Dict[str, typing.List[typing.Any]]
-    expression = {"$or": []}  # type: typing.Dict[str, typing.List[typing.Any]]
     if language:
-        expression["$or"].append({"language": language})
+        query["$and"].append({"language": language})
     if customer_id:
-        expression["$or"].append({"customer_id": customer_id})
-    if expression["$or"]:
-        query["$and"].append(expression)
+        query["$and"].append({"customer_id": customer_id})
     count = await db.chatbot.dialog.count_documents(query)
     cursor = db.chatbot.dialog.find(query)
     cursor.sort("date", -1).skip(offset).limit(limit)
