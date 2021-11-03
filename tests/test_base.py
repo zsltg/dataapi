@@ -40,12 +40,8 @@ class BaseTest(unittest.TestCase):
                 {"_id": entry["_id"]}, {"$set": {"consent_received": True}}
             )
 
-    def test_pass(self):
-        pass
-
     def tearDown(self):
-        # self._db.delete_many({})
-        pass
+        self._db.delete_many({})
 
     def _create_dialogs_with_one_consent(self, client):
         # create some new dialogs
