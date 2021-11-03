@@ -1,49 +1,93 @@
 # pylint: disable=C0114,C0115,C0116
 import unittest
+import datetime
+import uuid
+import random
+import string
 
-from fastapi import testclient
+from fastapi import encoders
+import pymongo
+from lorem_text import lorem
 
-from dataapi import main
+from dataapi import config
+from dataapi.models import dialog_model
 
 
 class BaseTest(unittest.TestCase):
 
+    _settings = config.get_settings()
+    _client = pymongo.MongoClient(_settings.mongodb_url, int(_settings.mongodb_port))
+    _db = _client.chatbot.dialog
     _data_path_prefix = "/data"
     _consent_path_prefix = "/consents"
-    _dialogs = [
-        {
-            "dialog_id": "123453697821-b204-474d-b646-d8702690381e",
-            "customer_id": "janedoe",
-            "body": {"text": "The quick brown fox", "language": "EN"},
-        },
-        {
-            "dialog_id": "123522037567-ad6b-441c-8e28-25f3c9e4558b",
-            "customer_id": "janedoe",
-            "body": {"text": "Jumps over the lazy dog", "language": "EN"},
-        },
-        {
-            "dialog_id": "56781f4e9adb-d343-4129-8e2d-435387d16c7f",
-            "customer_id": "johndoe",
-            "body": {"text": "Der schnelle braune Fuchs", "language": "DE"},
-        },
-        {
-            "dialog_id": "567969636056-d26a-4785-b828-b145c0c62144",
-            "customer_id": "johndoe",
-            "body": {"text": "Springt über den faulen Hund", "language": "DE"},
-        },
-    ]
+    _languages = ["EN", "DE", "IT", "FR"]
+    _on_demand_dialogs = []
+    _bulk_customer_count = 10
+    _bulk_dialog_count = 1000
+    _bulk_consent_count = 500
 
     def setUp(self):
-        with testclient.TestClient(main.app) as client:
-            self._remove_all_test_dialogs(client)
+        self._db.delete_many({})
+        for dialog in self._generate_dialogs(10, 2, self._languages):
+            self._on_demand_dialogs.append(dialog)
+        for dialog in self._generate_dialogs(
+            self._bulk_customer_count, self._bulk_dialog_count, self._languages
+        ):
+            self._db.insert_one(dialog)
+        cursor = self._db.find().limit(self._bulk_consent_count)
+        for entry in cursor:
+            self._db.update_one(
+                {"_id": entry["_id"]}, {"$set": {"consent_received": True}}
+            )
+
+    def test_pass(self):
+        pass
 
     def tearDown(self):
-        with testclient.TestClient(main.app) as client:
-            self._remove_all_test_dialogs(client)
+        # self._db.delete_many({})
+        pass
+
+    def _create_dialogs_with_one_consent(self, client):
+        # create some new dialogs
+        for dialog in self._on_demand_dialogs:
+            client.post(
+                f"{self._data_path_prefix}/{dialog['customer_id']}/{dialog['_id']}",
+                json=self._get_dialog_request_body(dialog),
+            )
+        # record consent for first dialog
+        dialog = self._on_demand_dialogs[0]
+        response = client.post(
+            f"{self._consent_path_prefix}/{dialog['_id']}",
+            data="true",
+        )
+        return response
 
     @classmethod
-    def _remove_all_test_dialogs(cls, client):
-        for dialog in cls._dialogs:
-            client.delete(
-                f"{cls._data_path_prefix}/{dialog['customer_id']}/{dialog['dialog_id']}"
+    def _get_dialog_request_body(cls, dialog):
+        return {"text": dialog["text"], "language": dialog["language"]}
+
+    @classmethod
+    def _generate_customer_id(cls):
+        return "".join(
+            random.choice(string.ascii_lowercase) for i in range(random.randint(5, 10))
+        )
+
+    @classmethod
+    def _generate_dialog(cls, customer_id, language):
+        return encoders.jsonable_encoder(
+            dialog_model.DialogModel(
+                customer_id=customer_id,
+                dialog_id=str(uuid.uuid4()),
+                text=lorem.sentence(),
+                language=language,
+                date=datetime.datetime.utcnow(),
+            )
+        )
+
+    @classmethod
+    def _generate_dialogs(cls, customer_count, dialog_count, languages):
+        customers = [cls._generate_customer_id() for _ in range(customer_count)]
+        for _ in range(dialog_count):
+            yield cls._generate_dialog(
+                random.choice(customers), random.choice(languages)
             )
