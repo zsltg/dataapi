@@ -1,18 +1,18 @@
 import pydantic
-import bson
+import pybson
 import datetime
 
 
-class PyObjectId(bson.ObjectId):
+class PyObjectId(pybson.ObjectId):
     @classmethod
     def __get_validators__(cls):
         yield cls.validate
 
     @classmethod
     def validate(cls, v):
-        if not bson.ObjectId.is_valid(v):
+        if not pybson.ObjectId.is_valid(v):
             raise ValueError("Invalid Object ID")
-        return bson.ObjectId(v)
+        return pybson.ObjectId(v)
 
     @classmethod
     def __modify_schema__(cls, field_schema):
@@ -25,7 +25,7 @@ class DialogBaseModel(pydantic.BaseModel):
 
     class Config:
         allow_population_by_field_name = True
-        json_encoders = {bson.ObjectId: str}
+        json_encoders = {pybson.ObjectId: str}
         schema_extra = {
             "example": {
                 "text": "Lorem ipsum dolor sit amet",
@@ -42,7 +42,7 @@ class DialogModel(DialogBaseModel):
 
     class Config:
         allow_population_by_field_name = True
-        json_encoders = {bson.ObjectId: str}
+        json_encoders = {pybson.ObjectId: str}
         schema_extra = {
             "example": {
                 "dialog_id": "51d62c8e-4b81-4b1b-a288-bfd6ab2fa1bc",
