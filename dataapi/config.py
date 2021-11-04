@@ -6,7 +6,7 @@ import pydantic
 
 
 @lru_cache()
-def get_settings():
+def get_settings() -> object:
     """Get settings"""
     return Settings()
 

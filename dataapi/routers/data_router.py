@@ -5,6 +5,7 @@ import fastapi_pagination
 from fastapi import encoders
 from motor import motor_asyncio
 
+from dataapi import utils
 from dataapi.services import mongodb
 from dataapi.models import dialog_model
 from dataapi.controllers import dialog_controller
@@ -22,7 +23,7 @@ async def fetch_dialogs(
     language: typing.Optional[str] = None,
     customer_id: typing.Optional[str] = None,
     db: motor_asyncio.AsyncIOMotorClient = fastapi.Depends(mongodb.get_database),
-):
+) -> utils.OrjsonResponse:
     """
     Fetch dialogs in bulk.
 
@@ -41,7 +42,7 @@ async def fetch_dialog(
     customer_id: str,
     dialog_id: str,
     db: motor_asyncio.AsyncIOMotorClient = fastapi.Depends(mongodb.get_database),
-):
+) -> utils.OrjsonResponse:
     """
     Fetch a dialog.
 
@@ -63,7 +64,7 @@ async def create_dialog(
     dialog_id: str,
     dialog_body: dialog_model.DialogBaseModel = fastapi.Body(...),
     db: motor_asyncio.AsyncIOMotorClient = fastapi.Depends(mongodb.get_database),
-):
+) -> utils.OrjsonResponse:
     """
     Create a dialog.
 
@@ -89,7 +90,7 @@ async def remove_dialog(
     customer_id: str,
     dialog_id: str,
     db: motor_asyncio.AsyncIOMotorClient = fastapi.Depends(mongodb.get_database),
-):
+) -> utils.OrjsonResponse:
     """
     Remove a dialog.
 

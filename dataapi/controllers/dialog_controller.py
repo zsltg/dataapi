@@ -16,10 +16,10 @@ async def fetch_dialogs(
     offset: int = 0,
     language: typing.Optional[str] = None,
     customer_id: typing.Optional[str] = None,
-):
+) -> utils.OrjsonResponse:
     query = {
         "$and": [{"consent_received": True}]
-    }  # type: typing.Dict[str, typing.List[typing.Any]]
+    }  # type: typing.Dict[str, typing.List[typing.Union[typing.Dict[str, bool], typing.Dict[str, str]]]]
     if language:
         query["$and"].append({"language": language})
     if customer_id:
@@ -37,7 +37,7 @@ async def fetch_dialogs(
 
 async def fetch_dialog(
     db: motor_asyncio.AsyncIOMotorClient, customer_id: str, dialog_id: str
-):
+) -> utils.OrjsonResponse:
     dialog_entry = await db.chatbot.dialog.find_one(
         {"_id": dialog_id, "customer_id": customer_id}
     )
@@ -54,7 +54,7 @@ async def fetch_dialog(
 
 async def create_dialog(
     db: motor_asyncio.AsyncIOMotorClient, dialog_entry: dialog_model.DialogModel
-):
+) -> utils.OrjsonResponse:
     try:
         new_dialog = await db.chatbot.dialog.insert_one(dialog_entry)
     except pymongo.errors.DuplicateKeyError:
@@ -67,7 +67,7 @@ async def create_dialog(
 
 async def remove_dialog(
     db: motor_asyncio.AsyncIOMotorClient, customer_id: str, dialog_id: str
-):
+) -> utils.OrjsonResponse:
     result = await db.chatbot.dialog.delete_one({"_id": dialog_id, "customer_id": customer_id})
     if result.deleted_count:
         return utils.OrjsonResponse(status_code=fastapi.status.HTTP_200_OK)

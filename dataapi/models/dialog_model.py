@@ -1,3 +1,4 @@
+import typing
 import pydantic
 import pybson
 import datetime
@@ -5,11 +6,11 @@ import datetime
 
 class PyObjectId(pybson.ObjectId):
     @classmethod
-    def __get_validators__(cls):
+    def __get_validators__(cls) -> typing.Generator[typing.Callable, None, None]:
         yield cls.validate
 
     @classmethod
-    def validate(cls, v):
+    def validate(cls, v) -> pybson.ObjectId:
         if not pybson.ObjectId.is_valid(v):
             raise ValueError("Invalid Object ID")
         return pybson.ObjectId(v)

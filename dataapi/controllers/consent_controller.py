@@ -10,7 +10,7 @@ from dataapi.services import mongodb
 
 async def record_consent(
     db: motor_asyncio.AsyncIOMotorClient, dialog_id: str, consent: bool
-):
+) -> utils.OrjsonResponse:
     if consent:
         result = await db.chatbot.dialog.update_one(
             {"_id": dialog_id}, {"$set": {"consent_received": consent}}
