@@ -5,9 +5,9 @@ import fastapi_pagination
 from motor import motor_asyncio
 from fastapi import responses
 
+from dataapi import utils
 from dataapi.models import dialog_model
 from dataapi.services import mongodb
-from dataapi import utils
 
 
 async def fetch_dialogs(
@@ -68,5 +68,9 @@ async def create_dialog(
 async def remove_dialog(
     db: motor_asyncio.AsyncIOMotorClient, customer_id: str, dialog_id: str
 ):
-    await db.chatbot.dialog.delete_one({"_id": dialog_id, "customer_id": customer_id})
-    return utils.OrjsonResponse(status_code=fastapi.status.HTTP_204_NO_CONTENT)
+    result = await db.chatbot.dialog.delete_one({"_id": dialog_id, "customer_id": customer_id})
+    if result.deleted_count:
+        return utils.OrjsonResponse(status_code=fastapi.status.HTTP_200_OK)
+    else:
+        return utils.OrjsonResponse(status_code=fastapi.status.HTTP_404_NOT_FOUND)
+

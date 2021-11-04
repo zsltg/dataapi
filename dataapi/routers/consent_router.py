@@ -13,6 +13,7 @@ router = fastapi.APIRouter()
 @router.post(
     "/consents/{dialog_id}",
     response_description="Record consent",
+    responses={404: {"model": None}},
 )
 async def record_consent(
     dialog_id: str,

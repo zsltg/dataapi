@@ -28,7 +28,7 @@ async def fetch_dialogs(
     )
 
 
-@router.get("/data/{customer_id}/{dialog_id}")
+@router.get("/data/{customer_id}/{dialog_id}", responses={403: {"model": None}, 404: {"model": None}})
 async def fetch_dialog(
     customer_id: str,
     dialog_id: str,
@@ -41,6 +41,8 @@ async def fetch_dialog(
     "/data/{customer_id}/{dialog_id}",
     response_description="Add new dialog",
     response_model=dialog_model.DialogBaseModel,
+    status_code=201,
+    responses={409: {"model": None}}
 )
 async def create_dialog(
     customer_id: str,
@@ -60,7 +62,9 @@ async def create_dialog(
     return await dialog_controller.create_dialog(db, dialog_entry)
 
 
-@router.delete("/data/{customer_id}/{dialog_id}")
+@router.delete("/data/{customer_id}/{dialog_id}",
+    responses={404: {"model": None}},
+)
 async def remove_dialog(
     customer_id: str,
     dialog_id: str,
