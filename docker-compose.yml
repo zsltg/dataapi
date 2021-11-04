@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: release
+    container_name: dataapi-ui
+    environment:
+      MONGODB_URL: db
+      MONGODB_PORT: 27017
+  db:
+    image: mongo:5.0.3
+    container_name: dataapi-db
+    volumes:
+      - mongodb:/data/db
+      - mongodb_config:/data/configdb
+    command: mongod
+
+volumes:
+  mongodb:
+  mongodb_config:

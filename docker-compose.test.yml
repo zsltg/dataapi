@@ -1,0 +1,8 @@
+services:
+  api:
+    build:
+      context: .
+      target: test
+    container_name: dataapi-ui-test
+  db:
+    container_name: dataapi-db-test
