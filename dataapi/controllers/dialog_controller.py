@@ -1,3 +1,4 @@
+"""Dialog Controller"""
 import typing
 import pymongo
 import fastapi

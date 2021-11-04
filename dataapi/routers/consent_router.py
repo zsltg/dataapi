@@ -1,3 +1,4 @@
+"""Consent Router"""
 import fastapi
 
 from fastapi import encoders

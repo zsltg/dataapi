@@ -1,3 +1,4 @@
+"""MongoDB Service"""
 from motor import motor_asyncio
 
 from dataapi import config

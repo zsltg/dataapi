@@ -1,3 +1,4 @@
+"""Data Router"""
 import typing
 import datetime
 import fastapi

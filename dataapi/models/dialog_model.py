@@ -1,3 +1,4 @@
+"""Dialog Model"""
 import typing
 import pydantic
 import pybson

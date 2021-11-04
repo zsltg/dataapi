@@ -1,3 +1,4 @@
+"""Consent Controller"""
 import pymongo
 import fastapi
 from motor import motor_asyncio
