@@ -69,9 +69,10 @@ async def create_dialog(
 async def remove_dialog(
     db: motor_asyncio.AsyncIOMotorClient, customer_id: str, dialog_id: str
 ) -> utils.OrjsonResponse:
-    result = await db.chatbot.dialog.delete_one({"_id": dialog_id, "customer_id": customer_id})
+    result = await db.chatbot.dialog.delete_one(
+        {"_id": dialog_id, "customer_id": customer_id}
+    )
     if result.deleted_count:
         return utils.OrjsonResponse(status_code=fastapi.status.HTTP_200_OK)
     else:
         return utils.OrjsonResponse(status_code=fastapi.status.HTTP_404_NOT_FOUND)
-
