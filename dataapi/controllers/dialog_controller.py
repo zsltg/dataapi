@@ -12,10 +12,10 @@ from dataapi.services import mongodb
 
 async def fetch_dialogs(
     db: motor_asyncio.AsyncIOMotorClient,
-    limit: int = 100,
-    offset: int = 0,
     language: typing.Optional[str] = None,
     customer_id: typing.Optional[str] = None,
+    limit: int = 100,
+    offset: int = 0,
 ) -> utils.OrjsonResponse:
     query = {
         "$and": [{"consent_received": True}]

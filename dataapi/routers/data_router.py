@@ -18,10 +18,10 @@ router = fastapi.APIRouter()
     response_model=fastapi_pagination.LimitOffsetPage[dialog_model.DialogModel],
 )
 async def fetch_dialogs(
-    limit: int = 100,
-    offset: int = 0,
     language: typing.Optional[str] = None,
     customer_id: typing.Optional[str] = None,
+    limit: int = 100,
+    offset: int = 0,
     db: motor_asyncio.AsyncIOMotorClient = fastapi.Depends(mongodb.get_database),
 ) -> utils.OrjsonResponse:
     """
@@ -33,7 +33,7 @@ async def fetch_dialogs(
     - **offset**: number of dialogs to skip
     """
     return await dialog_controller.fetch_dialogs(
-        db, limit, offset, language, customer_id
+        db, language, customer_id, limit, offset
     )
 
 
