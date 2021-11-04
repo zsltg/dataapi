@@ -23,6 +23,14 @@ async def fetch_dialogs(
     customer_id: typing.Optional[str] = None,
     db: motor_asyncio.AsyncIOMotorClient = fastapi.Depends(mongodb.get_database),
 ):
+    """
+    Fetch dialogs in bulk.
+
+    - **language**: language of the dialogs to return (optional)
+    - **customer_id**: return only dialogs for this customer id (optional)
+    - **limit**: maximum number of dialogs to return
+    - **offset**: number of dialogs to skip
+    """
     return await dialog_controller.fetch_dialogs(
         db, limit, offset, language, customer_id
     )
@@ -34,6 +42,12 @@ async def fetch_dialog(
     dialog_id: str,
     db: motor_asyncio.AsyncIOMotorClient = fastapi.Depends(mongodb.get_database),
 ):
+    """
+    Fetch a dialog.
+
+    - **customer_id**: customer id of the dialog to return
+    - **dialog_id**: dialog id of the dialog to return
+    """
     return await dialog_controller.fetch_dialog(db, customer_id, dialog_id)
 
 
@@ -50,6 +64,12 @@ async def create_dialog(
     dialog_body: dialog_model.DialogBaseModel = fastapi.Body(...),
     db: motor_asyncio.AsyncIOMotorClient = fastapi.Depends(mongodb.get_database),
 ):
+    """
+    Create a dialog.
+
+    - **customer_id**: customer id of the dialog to create
+    - **dialog_id**: dialog id of the dialog to create
+    """
     dialog_entry = encoders.jsonable_encoder(
         dialog_model.DialogModel(
             customer_id=customer_id,
@@ -70,4 +90,10 @@ async def remove_dialog(
     dialog_id: str,
     db: motor_asyncio.AsyncIOMotorClient = fastapi.Depends(mongodb.get_database),
 ):
+    """
+    Remove a dialog.
+
+    - **customer_id**: customer id of the dialog to remove
+    - **dialog_id**: dialog id of the dialog to remove
+    """
     return await dialog_controller.remove_dialog(db, customer_id, dialog_id)

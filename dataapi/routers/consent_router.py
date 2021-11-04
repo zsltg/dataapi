@@ -20,4 +20,9 @@ async def record_consent(
     consent_body: bool = fastapi.Body(...),
     db: motor_asyncio.AsyncIOMotorClient = fastapi.Depends(mongodb.get_database),
 ):
+    """
+    Record a consent.
+
+    - **dialog_id**: record consent for the dialog with this id
+    """
     return await consent_controller.record_consent(db, dialog_id, consent_body)
