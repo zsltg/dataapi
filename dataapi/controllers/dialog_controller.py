@@ -25,8 +25,13 @@ async def fetch_dialogs(
         query["$and"].append({"language": language})
     if customer_id:
         query["$and"].append({"customer_id": customer_id})
-    count = await db.chatbot.dialog.count_documents(query)
-    cursor = db.chatbot.dialog.find(query)
+    try:
+        count = await db.chatbot.dialog.count_documents(query)
+        cursor = db.chatbot.dialog.find(query)
+    except pymongo.errors.ServerSelectionTimeoutError:
+        return utils.OrjsonResponse(
+            status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
     cursor.sort("date", -1).skip(offset).limit(limit)
     hits = await cursor.to_list(length=None)
     params = fastapi_pagination.LimitOffsetParams(limit=limit, offset=0)
@@ -39,9 +44,14 @@ async def fetch_dialogs(
 async def fetch_dialog(
     db: motor_asyncio.AsyncIOMotorClient, customer_id: str, dialog_id: str
 ) -> utils.OrjsonResponse:
-    dialog_entry = await db.chatbot.dialog.find_one(
-        {"_id": dialog_id, "customer_id": customer_id}
-    )
+    try:
+        dialog_entry = await db.chatbot.dialog.find_one(
+            {"_id": dialog_id, "customer_id": customer_id}
+        )
+    except pymongo.errors.ServerSelectionTimeoutError:
+        return utils.OrjsonResponse(
+            status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
     if dialog_entry:
         if dialog_entry["consent_received"]:
             return utils.OrjsonResponse(
@@ -60,6 +70,10 @@ async def create_dialog(
         new_dialog = await db.chatbot.dialog.insert_one(dialog_entry)
     except pymongo.errors.DuplicateKeyError:
         return utils.OrjsonResponse(status_code=fastapi.status.HTTP_409_CONFLICT)
+    except pymongo.errors.ServerSelectionTimeoutError:
+        return utils.OrjsonResponse(
+            status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
     created_dialog = await db.chatbot.dialog.find_one({"_id": new_dialog.inserted_id})
     return utils.OrjsonResponse(
         status_code=fastapi.status.HTTP_201_CREATED, content=created_dialog
@@ -69,9 +83,14 @@ async def create_dialog(
 async def remove_dialog(
     db: motor_asyncio.AsyncIOMotorClient, customer_id: str, dialog_id: str
 ) -> utils.OrjsonResponse:
-    result = await db.chatbot.dialog.delete_one(
-        {"_id": dialog_id, "customer_id": customer_id}
-    )
+    try:
+        result = await db.chatbot.dialog.delete_one(
+            {"_id": dialog_id, "customer_id": customer_id}
+        )
+    except pymongo.errors.ServerSelectionTimeoutError:
+        return utils.OrjsonResponse(
+            status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
     if result.deleted_count:
         return utils.OrjsonResponse(status_code=fastapi.status.HTTP_200_OK)
     else:

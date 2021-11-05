@@ -16,6 +16,7 @@ class Settings(pydantic.BaseSettings):
 
     mongodb_url: str
     mongodb_port: str
+    mongodb_timeout: str
 
     class Config:
         """Settings Configuration"""

@@ -17,6 +17,7 @@ router = fastapi.APIRouter()
 @router.get(
     "/data/",
     response_model=fastapi_pagination.LimitOffsetPage[dialog_model.DialogModel],
+    responses={500: {"model": None}},
 )
 async def fetch_dialogs(
     language: typing.Optional[str] = None,
@@ -40,7 +41,7 @@ async def fetch_dialogs(
 
 @router.get(
     "/data/{customer_id}/{dialog_id}",
-    responses={403: {"model": None}, 404: {"model": None}},
+    responses={403: {"model": None}, 404: {"model": None}, 500: {"model": None}},
 )
 async def fetch_dialog(
     customer_id: str,
@@ -61,7 +62,7 @@ async def fetch_dialog(
     response_description="Add new dialog",
     response_model=dialog_model.DialogBaseModel,
     status_code=201,
-    responses={409: {"model": None}},
+    responses={409: {"model": None}, 500: {"model": None}},
 )
 async def create_dialog(
     customer_id: str,
@@ -89,7 +90,7 @@ async def create_dialog(
 
 @router.delete(
     "/data/{customer_id}/{dialog_id}",
-    responses={404: {"model": None}},
+    responses={404: {"model": None}, 500: {"model": None}},
 )
 async def remove_dialog(
     customer_id: str,

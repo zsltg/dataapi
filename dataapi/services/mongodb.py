@@ -19,7 +19,8 @@ async def get_database() -> motor_asyncio.AsyncIOMotorClient:
 
 async def connect():
     db.client = motor_asyncio.AsyncIOMotorClient(
-        str("mongodb://{}:{}".format(settings.mongodb_url, settings.mongodb_port))
+        str("mongodb://{}:{}".format(settings.mongodb_url, settings.mongodb_port)),
+        serverSelectionTimeoutMS=settings.mongodb_timeout,
     )
 
 
