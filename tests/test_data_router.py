@@ -51,6 +51,12 @@ class RoutersDataTest(test_base.BaseTest):
                 )
                 item_count += len(response.json()["items"])
             self.assertEqual(self._bulk_consent_count, item_count)
+            # check if limit and offset is set correctly
+            response = client.get(
+                f"{self._data_path_prefix}/?limit=50&offset=150",
+            )
+            self.assertEqual(response.json()["limit"], 50)
+            self.assertEqual(response.json()["offset"], 150)
 
     def test_fetch_on_demand_dialogs(self):
         with testclient.TestClient(main.app) as client:

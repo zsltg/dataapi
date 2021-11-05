@@ -36,6 +36,7 @@ async def fetch_dialogs(
     hits = await cursor.to_list(length=None)
     params = fastapi_pagination.LimitOffsetParams(limit=limit, offset=0)
     content = fastapi_pagination.paginate(hits, params, length_function=lambda _: count)
+    content.offset = offset
     return utils.OrjsonResponse(
         status_code=fastapi.status.HTTP_200_OK, content=content.dict()
     )
